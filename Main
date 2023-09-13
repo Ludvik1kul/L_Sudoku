@@ -1,0 +1,55 @@
+import copy
+board =[[".",".",".",".",".",".",".",".","."],[".",".",".",".",".",".",".",".","."],[".",".",".",".",".",".",".",".","."],
+[".",".",".",".",".",".",".",".","."],[".",".",".",".",".",".",".",".","."],[".",".",".",".",".",".",".",".","."],
+[".",".",".",".",".",".",".",".","."],[".",".",".",".",".",".",".",".","."],[".",".",".",".",".",".",".",".","."]]
+
+og_board = copy.deepcopy(board)
+holder = False
+kvadrats = [[] for i in board]
+for i in range(0, 9):
+    for o in range(0, 9):
+        if i < 3:
+            kvadrats[o // 3].append(board[i][o])
+        if i >= 3 and i < 6:
+            kvadrats[(o // 3) + 3].append(board[i][o])
+        if i >= 6:
+            kvadrats[(o // 3) + 6].append(board[i][o])
+
+def search(x, y):
+    global holder
+    if holder == True:
+        return
+
+    #for i in board:
+    #    print(i)
+    #print()
+    if y > 8:
+        y = 0
+        x += 1
+    if x > 8:
+        holder = True
+        return board
+    if og_board[x][y] != ".":
+        return search(x, y + 1)
+    check = set(board[x])
+    for i in board:
+        if i[y] not in check:
+            check.add(i[y])
+    kvadrat_x = x // 3
+    kvadrat_y = (y // 3)
+    lok_x = (x % 3) * 3
+    lok_y = y % 3
+    for attempt in range(1, 10):
+        if holder == True:
+            return
+        if str(attempt) not in check and str(attempt) not in kvadrats[kvadrat_y + (3 * kvadrat_x)]:
+            board[x][y] = str(attempt)
+            kvadrats[kvadrat_y + (3 * kvadrat_x)][lok_x + lok_y] = str(attempt)
+            search(x, y + 1)
+    if holder == True:
+        return
+    board[x][y] = "."
+    kvadrats[kvadrat_y + (3 * kvadrat_x)][lok_x + lok_y] = "."
+search(0, 0)
+for i in board:
+    print(i)
